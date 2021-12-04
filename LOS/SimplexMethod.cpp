@@ -153,7 +153,12 @@ void SimplexMethod::solve_imit(const int& quantity_imit) {
 	sm_imit.solve();
 	if (sm_imit.get_solution() != 0) _state = Solution::inconsistent;
 	else {
-
+		int imit_row = sm_imit.check_for_imit(_n);
+		while (imit_row != -1) {
+			sm_imit.exclude_imit_column(imit_row, _n);
+			imit_row = sm_imit.check_for_imit(_n);
+		}
+		transform_task(sm_imit);
 	}
 }
 
@@ -166,6 +171,52 @@ void SimplexMethod::gauss_tranform_imit() {
 		--leading_row;
 		--leading_column;
 	}
+}
+
+int SimplexMethod::check_for_imit(const int& dim) {
+	for (auto& elem : _basis)
+		if (elem > dim) return elem;
+
+	return -1;
+}
+
+void SimplexMethod::exclude_imit_column(const int& imit_column,
+										const int& dim) {
+	int row = -1;
+	for (int i = 1; i < _m + 1; ++i)
+		if (_simplex_table[i][imit_column] == 1) row = i;
+
+	bool everyone_is_zero = true;
+	int leading_column = -1;
+	for (int j = 0; j < _n + 1; ++j)
+		if ((_simplex_table[row][j] != 0) && (j != imit_column)) {
+			everyone_is_zero = false;
+			if ((j > 0) && (j < dim + 1) && (leading_column == -1))
+				leading_column = j;
+		}
+
+	if (everyone_is_zero)
+		_simplex_table.erase(_simplex_table.begin() + row + 1);
+	else {
+		basis_transform(row, leading_column);
+		gauss_transform(row, leading_column);
+	}
+}
+
+double SimplexMethod::get_elem(const int& row, const int& column) const {
+	return _simplex_table[row][column];
+}
+
+Basis SimplexMethod::get_basis() const {
+	return _basis;
+}
+
+void SimplexMethod::transform_task(const SimplexMethod& out) {
+	for (int i = 1; i < _m + 1; ++i)
+		for (int j = 0; j < _n + 1; ++j)
+			_simplex_table[i][j] = out.get_elem(i, j);
+
+	_basis = out.get_basis();
 }
 
 void SimplexMethod::solve() {

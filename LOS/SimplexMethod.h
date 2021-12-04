@@ -11,7 +11,7 @@ using Basis = std::vector<int>;
 *		this is linear optimization solver. it uses simplex method.
 * 
 *		it solves the following task:
-*		<c, x> -> max
+*		<c, x> -> min
 *		Ax = b
 *		x >= 0
 * 
@@ -43,6 +43,11 @@ private: // Methods
 	void solve_imit(const int& quantity_imit);
 	void gauss_tranform_imit();
 	double get_solution() { return _simplex_table[0][0]; }
+	int check_for_imit(const int& dim);
+	void exclude_imit_column(const int& imit_column, const int& dim);
+	double get_elem(const int& row, const int& column) const;
+	void transform_task(const SimplexMethod& out);
+	Basis get_basis() const;
 public:
 	SimplexMethod(const Vec& c, const Vec& b, const Matrix& A, const bool& m = false);
 	void solve();
