@@ -42,15 +42,20 @@ private: // Methods
 	void iterate();
 	void solve_imit(const int& quantity_imit);
 	void gauss_tranform_imit();
-	double get_solution() { return _simplex_table[0][0]; }
 	int check_for_imit(const int& dim);
 	void exclude_imit_column(const int& imit_column, const int& dim);
 	double get_elem(const int& row, const int& column) const;
 	void transform_task(const SimplexMethod& out);
+	void transform_for_basis();
+	double detect_one(const int& basis);
 	Basis get_basis() const;
 public:
 	SimplexMethod(const Vec& c, const Vec& b, const Matrix& A, const bool& m = false);
 	void solve();
+	double get_solution() const { return _simplex_table[0][0]; }
+	Solution get_state() const { return _state; }
+	double get_basis_size() const { return _basis.size(); }
+	~SimplexMethod() {}
 };
 
 #endif // SIMPLEX_METHOD_H
